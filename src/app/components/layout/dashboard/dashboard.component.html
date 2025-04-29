@@ -1,0 +1,44 @@
+<mat-sidenav-container class="sidenav-container" *ngIf="true">
+  <mat-sidenav
+    #drawer
+    class="sidenav"
+    fixedInViewport
+    [mode]="'side'"
+    [opened]="true"
+  >
+    <mat-toolbar-row>
+      <img src="/almentor-logo.jpeg" alt="Almentor Logo" class="logo-icon" />
+      <h3 class="dashboard-title">Almentor Dashboard</h3>
+    </mat-toolbar-row>
+    <mat-nav-list>
+      @for (item of menuItems; track item.path) {
+      <a
+        mat-list-item
+        [routerLink]="item.path"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+        <span matListItemTitle>{{ item.label }}</span>
+      </a>
+      }
+    </mat-nav-list>
+
+    <div class="theme-toggle">
+      <div class="theme-toggle-content">
+        <span class="theme-label">Switch Mode</span>
+        <mat-slide-toggle [(ngModel)]="isDarkTheme" (change)="toggleTheme()">
+          Dark Mode
+        </mat-slide-toggle>
+      </div>
+    </div>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar class="white-toolbar">
+      <span>Dashboard</span>
+    </mat-toolbar>
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
