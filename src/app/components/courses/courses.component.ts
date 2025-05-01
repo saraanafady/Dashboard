@@ -1,6 +1,6 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { CoursesService } from '../../services/course.service';
 import { TopicsService } from '../../services/topics.service';
 import { Course } from '../../interfaces/course';
@@ -20,6 +20,7 @@ import { MatDialogModule } from '@angular/material/dialog';
   selector: 'app-courses',
   templateUrl: './courses.component.html',
   styleUrls: ['./courses.component.scss'],
+  standalone: true,
   imports: [
     CommonModule,
     MatTableModule,
@@ -30,9 +31,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatButtonModule,
     MatCardModule,
     MatIconModule,
-    MatDialogModule
-  ],
-  standalone: true
+    MatDialogModule,
+  ]
 })
 export class CoursesComponent implements OnInit {
   @ViewChild('addDialog') addDialog!: TemplateRef<any>;
@@ -144,8 +144,12 @@ export class CoursesComponent implements OnInit {
       description: { en: '', ar: '' },
       availableLanguages: ['en']
     });
-    this.dialog.open(this.addDialog, {
-      width: '800px'
+    
+    // Use this approach for standalone components
+    setTimeout(() => {
+      this.dialog.open(this.addDialog, {
+        width: '800px'
+      });
     });
   }
 
@@ -168,17 +172,23 @@ export class CoursesComponent implements OnInit {
       thumbnailImgUrl: course.thumbnailImgUrl || '',
       availableLanguages: course.availableLanguages || []
     });
-    this.dialog.open(this.updateDialog, {
-      width: '800px'
+    
+    // Use this approach for standalone components
+    const dialogRef = this.dialog.open(this.updateDialog, {
+      width: '800px',
+      data: { course: course }
     });
-
-
   }
 
   // Add course
   addNewCourse() {
     if (this.addForm.valid) {
-      const newCourse = this.addForm.value;
+      const newCourse = {
+        ...this.addForm.value,
+        topic: this.addForm.value.topicId
+      };
+      delete newCourse.topicId;
+  
       this.coursesService.addCourse(newCourse).subscribe({
         next: () => {
           this.loadCourses();
@@ -190,7 +200,6 @@ export class CoursesComponent implements OnInit {
       });
     }
   }
-
   // Update course
   // updateCourse() {
   //   if (this.updateForm.valid) {
@@ -251,6 +260,7 @@ export class CoursesComponent implements OnInit {
         course.instructor?.toLowerCase().includes(search);
       return matchesSearch;
     });
+    
   }
   // Filter courses by topic
   filterCoursesTopic() {
@@ -265,4 +275,8 @@ export class CoursesComponent implements OnInit {
     this.searchControl.setValue('');
     this.selectedTopic.setValue('');
   }
+
 }
+
+
+
